@@ -6,6 +6,8 @@ const placesRoutes = require('./routes/places-route');
 
 const app = express();
 
+app.use(bodyPasrser.json());
+
 app.use('/api/places', placesRoutes);
 
 app.use((error, req, res, next) => {
