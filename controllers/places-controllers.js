@@ -3,13 +3,16 @@ const { v4: uuid } = require('uuid');
 
 const HttpError = require('../models/http-error');
 //const getCoordsForAddress = require('../util/location');
+const Place = require('../models/place');
+
+
 
 let DUMMY_PLACES = [
     {
         id: 'p1',
         title: 'Empire state bouilding',
         description: 'One of the most famous sky scrapers in the woorld',
-        locaton: {
+        location: {
             lat: 40.7484474,
             lng: -73.9871516
         },
@@ -66,15 +69,27 @@ const createPlace = async (req, res, next) => {
     // }
 
 
-    const createdPlace = {
-        id: uuid(),
+    const createdPlace = new Place({
         title,
         description,
-        location: coordinates,
         address,
+        location: {
+            lat: 40.7484474,
+            lng: -73.9871516
+        },
+        image: 'https://firebasestorage.googleapis.com/v0/b/myapp-c3e74.appspot.com/o/5afe8b46c08ca750f1040f62896545a5c-f1xd-w1020_h770_q80.jpg?alt=media&token=ecb1893a-f412-44ab-bfd6-dba76144fd38',
         creator
-    };
-    DUMMY_PLACES.push(createdPlace);
+    });
+
+    try {
+        await createdPlace.save();
+    } catch (err) {
+        const error = new HttpError(
+            'Creationg place failed',
+            500
+        )
+        return next(error);
+    }
 
     res.status(201).json({ place: createdPlace });
 };
