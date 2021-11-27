@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyPasrser = require('body-parser');
+const mongoose = require('mongoose');
 
 const placesRoutes = require('./routes/places-route');
 const usersRoutes = require('./routes/users-routes');
@@ -26,4 +27,11 @@ app.use((error, req, res, next) => {
 })
 
 
-app.listen(5000);
+mongoose
+    .connect('mongodb+srv://menu:searchplace@searchplace.s1rq8.mongodb.net/places?retryWrites=true&w=majority')
+    .then(() => {
+        app.listen(5000);
+    })
+    .catch(err => {
+        console.log(err);
+    });
