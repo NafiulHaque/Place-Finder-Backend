@@ -2,6 +2,8 @@ const { v4: uuid } = require('uuid');
 const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
+const User = require('../models/user');
+
 
 const DUMMY_USERS = [
     {
@@ -18,25 +20,55 @@ const getUsers = (req, res, next) => {
 };
 
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
 
-        throw new HttpError('Invalid inputs passed , please check your data.', 422);
+        return next(new HttpError('Invalid inputs passed , please check your data.', 422)
+        );
     }
-    const { name, email, password } = req.body;
+    const { name, email, password, places } = req.body;
 
-    const createdUser = {
-        id: uuid(),
+    let existingUser;
+    try {
+        existingUser = await User.findOne({ email: email });
+    } catch (err) {
+        const error = new HttpError(
+            'Singing up failed , plaese try again later',
+            500
+
+        )
+        return next(error);
+    }
+
+    if (existingUser) {
+        const error = new HttpError(
+            'User exists already, please login instead.',
+            422
+        );
+        return next(error);
+    }
+
+    const createdUser = new User({
         name,
         email,
-        password
+        image: 'https://firebasestorage.googleapis.com/v0/b/myapp-c3e74.appspot.com/o/82531761_171253510889533_5937920248739138889_n.jpg?alt=media&token=c17d0068-95ec-48df-bb40-2564675904ca',
+        password,
+        places
+    });
 
-    };
+    try {
+        await createdUser.save();
+    } catch (err) {
+        const error = new HttpError(
+            'Signing up  failed',
+            500
+        )
+        return next(error);
+    }
 
-    DUMMY_USERS.push(createdUser);
-    res.status(201).json({ user: createdUser });
+    res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
 
