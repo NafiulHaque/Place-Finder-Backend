@@ -24,7 +24,7 @@ const getUsers = async (req, res, next) => {
             'Fetching users failed, please try again later.',
             500
         );
-        return next(err);
+        return next(error);
     }
     res.json({ users: users.map(user => user.toObject({ getters: true })) });
 
@@ -39,7 +39,7 @@ const signup = async (req, res, next) => {
         return next(new HttpError('Invalid inputs passed , please check your data.', 422)
         );
     }
-    const { name, email, password, places } = req.body;
+    const { name, email, password } = req.body;
 
     let existingUser;
     try {
@@ -66,7 +66,7 @@ const signup = async (req, res, next) => {
         email,
         image: 'https://firebasestorage.googleapis.com/v0/b/myapp-c3e74.appspot.com/o/82531761_171253510889533_5937920248739138889_n.jpg?alt=media&token=c17d0068-95ec-48df-bb40-2564675904ca',
         password,
-        places
+        places: []
     });
 
     try {
