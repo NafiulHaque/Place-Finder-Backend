@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 
@@ -91,7 +92,7 @@ const createPlace = async (req, res, next) => {
             lat: 40.7484474,
             lng: -73.9871516
         },
-        image: 'https://firebasestorage.googleapis.com/v0/b/myapp-c3e74.appspot.com/o/5afe8b46c08ca750f1040f62896545a5c-f1xd-w1020_h770_q80.jpg?alt=media&token=ecb1893a-f412-44ab-bfd6-dba76144fd38',
+        image: req.file.path,
         creator
     });
 
@@ -199,6 +200,8 @@ const deletePlace = async (req, res, next) => {
         return next(error);
     }
 
+    const imagePath = place.image;
+
     try {
         const sess = await mongoose.startSession();
         sess.startTransaction();
@@ -214,6 +217,10 @@ const deletePlace = async (req, res, next) => {
         );
         return next(error);
     }
+
+    fs.unlink(imagePath, err => {
+        console.log(err);
+    })
 
     res.status(200).json({ message: 'Deleted place.' })
 };
