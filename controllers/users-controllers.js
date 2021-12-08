@@ -30,6 +30,7 @@ const signup = async (req, res, next) => {
     }
     const { name, email, password } = req.body;
 
+
     let existingUser;
     try {
         existingUser = await User.findOne({ email: email });
@@ -53,7 +54,7 @@ const signup = async (req, res, next) => {
     const createdUser = new User({
         name,
         email,
-        image: 'https://firebasestorage.googleapis.com/v0/b/myapp-c3e74.appspot.com/o/82531761_171253510889533_5937920248739138889_n.jpg?alt=media&token=c17d0068-95ec-48df-bb40-2564675904ca',
+        image: req.file.path,
         password,
         places: []
     });
