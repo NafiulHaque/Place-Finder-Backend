@@ -23,6 +23,7 @@ const getPlaceById = async (req, res, next) => {
     }
 
 
+
     if (!place) {
         const error = new HttpError(
             'Could not find a place for the provided id?',
@@ -156,6 +157,14 @@ const updatePlace = async (req, res, next) => {
         const error = new HttpError(
             'Something went worong, could not update place',
             500
+        );
+        return next(error);
+    }
+
+    if (place.creator.toString() !== req.userData.userId) {
+        const error = new HttpError(
+            'You are not allowed to edit this place',
+            401
         );
         return next(error);
     }
